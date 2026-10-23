@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>UCL Match Prediction</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+</head>
+
+<body>
+
+    <!-- FOOTBALL ATMOSPHERE -->
+    <div class="stadium-bg">
+        <div class="stadium-light light-one"></div>
+        <div class="stadium-light light-two"></div>
+        <div class="pitch-lines"></div>
+        <div class="floating-ball ball-one">⚽</div>
+        <div class="floating-ball ball-two">⚽</div>
+    </div>
+
+    <main class="container">
+
+        <!-- HERO / MATCH CENTER HEADER -->
+        <header class="hero-header">
+
+            <div class="competition-badge">
+                <span class="trophy">🏆</span>
+                <span>UEFA CHAMPIONS LEAGUE</span>
+            </div>
+
+            <div class="hero-content">
+
+                <div class="hero-ball">
+                    ⚽
+                </div>
+
+                <div>
+                    <p class="eyebrow">AI FOOTBALL ANALYTICS</p>
+
+                    <h1>
+                        UCL <span>Match Center</span>
+                    </h1>
+
+                    <p class="subtitle">
+                        Machine Learning powered match prediction & analysis
+                    </p>
+                </div>
+
+            </div>
+
+            <div class="live-status">
+                <span class="live-dot"></span>
+                AI PREDICTION ENGINE
+            </div>
+
+        </header>
+
+
+        <!-- MATCH SELECTOR -->
+        <section class="card match-center-card">
+
+            <div class="section-title">
+
+                <div class="section-icon">🏟️</div>
+
+                <div>
+                    <h2>Build Your Match</h2>
+                    <p>Select two Champions League teams for analysis</p>
+                </div>
+
+            </div>
+
+
+            <div class="match-selector">
+
+                <!-- HOME TEAM -->
+                <div class="team-selector">
+
+                    <div class="team-label">
+                        <span>HOME</span>
+                        <small>HOST TEAM</small>
+                    </div>
+
+                    <div class="team-crest-placeholder" id="homeCrest">
+                        🏠
+                    </div>
+
+                    <select id="homeTeam">
+
+                        <option value="">
+                            Select Home Team
+                        </option>
+
+                        {% for team in teams %}
+                        <option value="{{ team }}">
+                            {{ team }}
+                        </option>
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <!-- VS -->
+                <div class="match-vs">
+
+                    <div class="vs-line"></div>
+
+                    <div class="vs-circle">
+                        VS
+                    </div>
+
+                    <div class="vs-line"></div>
+
+                </div>
+
+
+                <!-- AWAY TEAM -->
+                <div class="team-selector">
+
+                    <div class="team-label">
+                        <span>AWAY</span>
+                        <small>VISITING TEAM</small>
+                    </div>
+
+                    <div class="team-crest-placeholder" id="awayCrest">
+                        ✈️
+                    </div>
+
+                    <select id="awayTeam">
+
+                        <option value="">
+                            Select Away Team
+                        </option>
+
+                        {% for team in teams %}
+                        <option value="{{ team }}">
+                            {{ team }}
+                        </option>
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <button
+                id="predictButton"
+                class="predict-button"
+            >
+
+                <span class="button-ball">⚽</span>
+
+                <span id="buttonText">
+                    Analyze Match
+                </span>
+
+                <span
+                    id="loader"
+                    class="loader hidden"
+                ></span>
+
+            </button>
+
+
+            <p
+                id="errorMessage"
+                class="error-message"
+            ></p>
+
+        </section>
+
+
+        <!-- RESULTS -->
+        <section
+            id="resultSection"
+            class="hidden"
+        >
+
+            <!-- SCOREBOARD -->
+            <div class="card scoreboard-card">
+
+                <div class="scoreboard-top">
+
+                    <span class="match-status">
+                        <span class="status-dot"></span>
+                        AI MATCH ANALYSIS
+                    </span>
+
+                    <span class="ucl-mark">
+                        UCL • PREDICTION
+                    </span>
+
+                </div>
+
+
+
+
+                <div class="scoreboard-teams">
+
+    <div class="score-team">
+        <div class="score-team-name" id="scoreHomeTeam">
+            HOME TEAM
+        </div>
+
+        <div class="score-value" id="scoreHome">
+            -
+        </div>
+    </div>
+
+    <div class="score-vs">
+        <div class="score-ball">⚽</div>
+        <span>VS</span>
+    </div>
+
+    <div class="score-team">
+        <div class="score-team-name" id="scoreAwayTeam">
+            AWAY TEAM
+        </div>
+
+        <div class="score-value" id="scoreAway">
+            -
+        </div>
+    </div>
+
+</div>
+
+
+
+
+                <div class="prediction-result">
+
+                    <span class="result-label">
+                        MODEL PREDICTION
+                    </span>
+
+                    <h2 id="predictionText">
+                        —
+                    </h2>
+
+                    <p id="matchText">
+                        —
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- RESULT PROBABILITIES -->
+            <div class="card probabilities-card">
+
+                <div class="section-title">
+
+                    <div class="section-icon">📊</div>
+
+                    <div>
+                        <h2>Match Probabilities</h2>
+                        <p>Model confidence across possible outcomes</p>
+                    </div>
+
+                </div>
+
+
+                <div class="probability-grid">
+
+                    <div class="probability-card home-card">
+
+                        <span class="probability-icon">🏠</span>
+
+                        <p>HOME WIN</p>
+
+                        <h3 id="homeProbability">0%</h3>
+
+                        <div class="progress">
+                            <div
+                                id="homeBar"
+                                class="progress-fill"
+                            ></div>
+                        </div>
+
+                    </div>
+
+
+                    <div class="probability-card draw-card">
+
+                        <span class="probability-icon">🤝</span>
+
+                        <p>DRAW</p>
+
+                        <h3 id="drawProbability">0%</h3>
+
+                        <div class="progress">
+                            <div
+                                id="drawBar"
+                                class="progress-fill"
+                            ></div>
+                        </div>
+
+                    </div>
+
+
+                    <div class="probability-card away-card">
+
+                        <span class="probability-icon">✈️</span>
+
+                        <p>AWAY WIN</p>
+
+                        <h3 id="awayProbability">0%</h3>
+
+                        <div class="progress">
+                            <div
+                                id="awayBar"
+                                class="progress-fill"
+                            ></div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- GOAL PREDICTION -->
+            <div class="card goal-card">
+
+                <div class="section-title">
+
+                    <div class="section-icon">⚽</div>
+
+                    <div>
+                        <h2>Goal Forecast</h2>
+                        <p>Machine learning estimated scoring output</p>
+                    </div>
+
+                </div>
+
+
+                <div class="goal-grid">
+
+                    <div class="goal-item">
+
+                        <span class="goal-icon">🏠</span>
+
+                        <span class="goal-label">
+                            HOME EXPECTED GOALS
+                        </span>
+
+                        <strong id="homeGoals">
+                            0.00
+                        </strong>
+
+                    </div>
+
+
+                    <div class="goal-item">
+
+                        <span class="goal-icon">✈️</span>
+
+                        <span class="goal-label">
+                            AWAY EXPECTED GOALS
+                        </span>
+
+                        <strong id="awayGoals">
+                            0.00
+                        </strong>
+
+                    </div>
+
+
+                    <div class="goal-item">
+
+                        <span class="goal-icon">📈</span>
+
+                        <span class="goal-label">
+                            TOTAL EXPECTED GOALS
+                        </span>
+
+                        <strong id="totalGoals">
+                            0.00
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="score-prediction">
+
+                    <span>
+                        PREDICTED SCORE
+                    </span>
+
+                    <strong id="predictedScore">
+                        — : —
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- MATCH REPORT -->
+            <div class="card report-card">
+
+                <div class="section-title">
+
+                    <div class="section-icon">📋</div>
+
+                    <div>
+                        <h2>Match Report</h2>
+                        <p>Complete prediction summary</p>
+                    </div>
+
+                </div>
+
+
+                <div class="report-grid">
+
+                    <div class="report-item">
+
+                        <span>HOME TEAM</span>
+
+                        <strong id="reportHome">
+                            —
+                        </strong>
+
+                    </div>
+
+
+                    <div class="report-item">
+
+                        <span>AWAY TEAM</span>
+
+                        <strong id="reportAway">
+                            —
+                        </strong>
+
+                    </div>
+
+
+                    <div class="report-item">
+
+                        <span>H2H MATCHES</span>
+
+                        <strong id="h2hMatches">
+                            —
+                        </strong>
+
+                    </div>
+
+
+                    <div class="report-item">
+
+                        <span>PREDICTED RESULT</span>
+
+                        <strong id="reportPrediction">
+                            —
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- PREDICTION HISTORY -->
+        <div class="card history-card">
+
+            <div class="section-title">
+
+                <div class="section-icon">🕘</div>
+
+                <div>
+                    <h2>Prediction History</h2>
+                    <p>Recently generated match predictions</p>
+                </div>
+
+            </div>
+
+
+            <div
+                id="historyContainer"
+                class="history-container"
+            >
+
+                <p class="history-loading">
+                    Loading prediction history...
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- FOOTER -->
+        <footer>
+
+            <div class="footer-ball">
+                ⚽
+            </div>
+
+            <p>
+                UCL Match Center • Machine Learning Football Analytics
+            </p>
+
+            <span>
+                Historical data based prediction
+            </span>
+
+        </footer>
+
+    </main>
+
+
+    <script
+        src="{{ url_for('static', filename='js/script.js') }}"
+    ></script>
+
+</body>
+
+</html>
