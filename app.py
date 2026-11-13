@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 import pandas as pd
 import os
+from flask_cors import CORS
 
 from src.predict import predict_match
 from src.database import (
@@ -11,7 +12,13 @@ from src.database import (
 
 
 app = Flask(__name__)
-
+CORS(app, resources={
+    r"/*": {
+        "origins": ["http://localhost:3000"],
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization"]
+    }
+})
 initialize_database()
 
 
